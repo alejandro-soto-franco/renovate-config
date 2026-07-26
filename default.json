@@ -1,0 +1,60 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits"
+  ],
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "timezone": "America/New_York",
+  "schedule": ["before 9am on monday"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "rebaseWhen": "conflicted",
+  "labels": ["dependencies"],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 9am on the first day of the month"]
+  },
+  "packageRules": [
+    {
+      "description": "Group all non-major Rust updates into one PR",
+      "matchManagers": ["cargo"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "cargo non-major"
+    },
+    {
+      "description": "Group all non-major Python updates into one PR",
+      "matchManagers": ["pep621", "pip_requirements"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "python non-major"
+    },
+    {
+      "description": "Group GitHub Actions updates, which are otherwise pure noise",
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions"
+    },
+    {
+      "description": "Major bumps land alone so the breakage is attributable",
+      "matchUpdateTypes": ["major"],
+      "groupName": null,
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "pyo3 and numpy move together; a split PR never builds",
+      "matchPackageNames": ["pyo3", "numpy", "pyo3-build-config", "pyo3-ffi"],
+      "groupName": "pyo3 stack"
+    },
+    {
+      "description": "CUDA and GPU crates are hardware-coupled, so review them by hand",
+      "matchPackageNames": ["cust", "cudarc", "ash", "wgpu", "cubecl", "cuda-oxide"],
+      "dependencyDashboardApproval": true
+    }
+  ],
+  "ignorePaths": [
+    "**/target/**",
+    "**/vendor/**",
+    "**/.venv/**"
+  ]
+}
